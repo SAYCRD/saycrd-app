@@ -172,13 +172,13 @@ You never repeat what you just said. You do not echo your previous response. If 
 # --- Presence Depth Logic ---
 def simulate_presence_depth(text):
     text = text.lower().strip()
-    
+
     deep_signals = [
         "i’m exhausted", "i feel broken", "i can’t anymore", "i’m afraid",
         "i’m holding something", "i want to let go", "i feel grief", "it hurts", "i don’t know",
         "i feel like i’m collapsing", "i’m overwhelmed", "i’m not okay", "i feel raw"
     ]
-    
+
     medium_signals = [
         "i’m tired", "i feel off", "i’m unsure", "it’s been hard", "i'm trying", "i feel stuck",
         "things on my mind", "can you help", "wondering if", "start again",
@@ -200,7 +200,6 @@ def simulate_presence_depth(text):
     else:
         base_score = 0.2
 
-    # Boost based on how many reflections have occurred
     if reflections >= 8:
         base_score += 0.15
     elif reflections >= 5:
@@ -210,67 +209,72 @@ def simulate_presence_depth(text):
 
     return min(base_score, 0.9)
 
-
-# --- Input Box ---
+# --- User Input ---
 user_input = st.text_area("What’s present for you?", height=200)
 
-# --- Main Logic ---
+# --- Run Reflection Button ---
 if st.button("Reflect with SAYCRD"):
-    if not api_key:
+    if not st.session_state.get('api_key'):
         st.warning("Please enter your OpenAI API key in the sidebar.")
     elif user_input.strip() == "":
         st.warning("Please enter something to reflect on.")
     else:
+        if 'reflection_history' not in st.session_state:
+            st.session_state['reflection_history'] = []
+        if 'reflections' not in st.session_state:
+            st.session_state['reflections'] = 0
+        if 'altar_thread' not in st.session_state:
+            st.session_state['altar_thread'] = []
+
         presence_depth = simulate_presence_depth(user_input)
         st.session_state['reflections'] += 1
         st.session_state['reflection_history'].append(user_input)
         reflection = None
 
-with st.spinner("Listening..."):
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4-turbo",
-            messages=[
-                {"role": "system", "content": core_prompt}
-            ] + [
-                {"role": "user", "content": msg}
-                for msg in st.session_state['reflection_history'][-4:]
-            ],
-            temperature=0.3
-        )
+        with st.spinner("Listening..."):
+            try:
+                client = st.session_state['client']
+                core_prompt = st.session_state['core_prompt']
+                response = client.chat.completions.create(
+                    model="gpt-4-turbo",
+                    messages=[
+                        {"role": "system", "content": core_prompt}
+                    ] + [
+                        {"role": "user", "content": msg}
+                        for msg in st.session_state['reflection_history'][-4:]
+                    ],
+                    temperature=0.3
+                )
+                reflection = response.choices[0].message.content
 
-reflection = response.choices[0].message.content
+            except Exception as e:
+                st.error(f"Something went wrong: {e}")
+                reflection = None
 
-except Exception as e:
-    st.error(f"Something went wrong: {e}")
-    reflection = None  # just in case something fails
+        # --- Post-Response Logic ---
+        if reflection:
+            if 'previous_reflection' in st.session_state:
+                if reflection.strip() == st.session_state['previous_reflection'].strip():
+                    reflection += "\n\n[Reflection was repeated. SAYCRD may need to wait instead.]"
 
-# 🧠 Post-response logic (outside the try block)
-if reflection:
-    # Check for reflection repetition
-    if 'previous_reflection' in st.session_state:
-        if reflection.strip() == st.session_state['previous_reflection'].strip():
-            reflection += "\n\n[Reflection was repeated. SAYCRD may need to wait instead.]"
+            st.session_state['previous_reflection'] = reflection
 
-    st.session_state['previous_reflection'] = reflection
+            st.markdown("---")
+            st.subheader("🌀 SAYCRD Reflection")
+            st.markdown(reflection)
 
-    st.markdown("---")
-    st.subheader("🌀 SAYCRD Reflection")
-    st.markdown(reflection)
+            if presence_depth >= 0.7:
+                st.session_state['altar_thread'].append("✦")
 
-    # Symbolic logic demo: mark Offering if depth is high
-    if presence_depth >= 0.7:
-        st.session_state['altar_thread'].append("✦")
+            st.markdown("### Raw SAYCRD Output (debug)")
+            st.code(reflection)
+            st.markdown(f"**Presence Depth:** `{presence_depth}`")
 
-    st.markdown("### Raw SAYCRD Output (debug)")
-    st.code(reflection)
-    st.markdown(f"**Presence Depth:** `{presence_depth}`")
+            if presence_depth >= 0.7:
+                st.success("✨ A ceremony may be ready to emerge.")
 
-    if presence_depth >= 0.7:
-        st.success("✨ A ceremony may be ready to emerge.")
-
-# --- Altar Thread Display ---
-if st.session_state['altar_thread']:
-    st.markdown("---")
-    st.subheader("🕯️ Altar Thread")
-    st.markdown(" ".join(st.session_state['altar_thread']))
+        # --- Altar Thread Display ---
+        if st.session_state['altar_thread']:
+            st.markdown("---")
+            st.subheader("🕯️ Altar Thread")
+            st.markdown(" ".join(st.session_state['altar_thread']))
