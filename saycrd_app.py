@@ -7,7 +7,13 @@ st.title("🔹 SAYCRD – Sacred Reflection Engine")
 
 # Sidebar for API key
 st.sidebar.title("🔐 API Key")
-openai.api_key = st.sidebar.text_input("Enter your OpenAI API key", type="password")
+api_key = st.sidebar.text_input("Enter your OpenAI API key", type="password")
+
+# Only create client if key is present
+if api_key:
+    client = openai.OpenAI(api_key=api_key)
+else:
+    client = None
 
 # --- SAYCRD Prompt ---
 core_prompt = """
@@ -22,7 +28,7 @@ Begin with this seeker reflection:
 # Input box
 user_input = st.text_area("Speak your truth:", height=200)
 
-# presence_depth simulation (naive first version)
+# presence_depth simulation (naive version)
 def simulate_presence_depth(text):
     length = len(text.strip())
     if length > 500:
@@ -34,31 +40,35 @@ def simulate_presence_depth(text):
     else:
         return 0.2
 
-# On button click, generate response
+# On button click, generate reflection
 if st.button("Reflect with SAYCRD"):
-    if not openai.api_key:
+    if not api_key:
         st.warning("Please enter your OpenAI API key in the sidebar.")
     elif user_input.strip() == "":
-        st.warning("Please enter something for SAYCRD to reflect.")
+        st.warning("Please enter something to reflect on.")
     else:
         presence_depth = simulate_presence_depth(user_input)
 
         with st.spinner("Listening..."):
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content": core_prompt},
-                    {"role": "user", "content": user_input}
-                ],
-                temperature=0.7
-            )
+            try:
+                response = client.chat.completions.create(
+                    model="gpt-4",
+                    messages=[
+                        {"role": "system", "content": core_prompt},
+                        {"role": "user", "content": user_input}
+                    ],
+                    temperature=0.7
+                )
 
-            reflection = response.choices[0].message.content
+                reflection = response.choices[0].message.content
 
-            st.markdown("---")
-            st.subheader("🌀 SAYCRD Reflection")
-            st.markdown(reflection)
-            st.markdown(f"**Presence Depth:** `{presence_depth}`")
+                st.markdown("---")
+                st.subheader("🌀 SAYCRD Reflection")
+                st.markdown(reflection)
+                st.markdown(f"**Presence Depth:** `{presence_depth}`")
 
-            if presence_depth >= 0.7:
-                st.success("✨ A ceremony may be ready to emerge.")
+                if presence_depth >= 0.7:
+                    st.success("✨ A ceremony may be ready to emerge.")
+
+            except Exception as e:
+                st.error(f"Something went wrong: {e}")
