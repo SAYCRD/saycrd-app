@@ -18,7 +18,6 @@ if api_key:
 
 
 # --- SETUP ---
-st.set_page_config(page_title="SAYCRD – Sacred Reflection Engine", layout="centered")
 st.title("🔹 SAYCRD – Sacred Reflection Engine")
 
 # Sidebar for API key
