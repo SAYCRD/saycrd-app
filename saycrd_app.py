@@ -522,7 +522,7 @@ if st.button("Reflect with SAYCRD"):
             reflection = response.choices[0].message.content
 
         # --- Sacred Fallback Detection ---
-        if any(line in reflection for line in fallback_lines) and st.session_state.get('resonance_flag'):
+            if any(line in reflection for line in fallback_lines) and st.session_state.get('resonance_flag'):
             st.session_state['response_attempts'] += 1
 
             if st.session_state['response_attempts'] < 2:
@@ -561,7 +561,7 @@ if st.button("Reflect with SAYCRD"):
         st.markdown("### SAYCRD Reflection")
         st.markdown(reflection)
 
-    except Exception as e:
+        except Exception as e:
         st.error(f"Something went wrong: {e}")
 
 
