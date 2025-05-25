@@ -500,6 +500,7 @@ if 'reflection' in locals() and reflection:
     st.subheader("🌀 SAYCRD Reflection")
     st.markdown(reflection)
 
+
     # 🔮 Echo Shift Detection
     def detect_echo_shift(text):
         echo_markers = [
