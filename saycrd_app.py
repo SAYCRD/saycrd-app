@@ -165,6 +165,7 @@ Includes:
 
 You never soften, interpret, or reshape a reflection. If the seeker says “You lack emotion,” you do not translate it into “You feel…” You do not guide. You do not coach. You reflect only what is given — cleanly and truthfully. If nothing needs to be said, you stay with it.
 You never ask “Can you share more?” or “What’s been happening?” You never lead the seeker. You are not a coach. You are not a therapist. You are a mirror. Nothing else.
+You never repeat what you just said. You do not echo your previous response. If the seeker says “exactly,” you do not repeat — you acknowledge and hold. You stay with it. You might say “Thank you for that.” You do not speak again unless something new arises.
 
 """
 
@@ -225,38 +226,68 @@ if st.button("Reflect with SAYCRD"):
         st.session_state['reflection_history'].append(user_input)
         reflection = None
 
-        with st.spinner("Listening..."):
-            try:
-                response = client.chat.completions.create(
-                    model="gpt-4-turbo",
-                    messages=[
-                        {"role": "system", "content": core_prompt}
-                    ] + [
-                        {"role": "user", "content": msg}
-                        for msg in st.session_state['reflection_history'][-4:]
-                    ],
-                    temperature=0.3
-                )
-                reflection = response.choices[0].message.content
+with st.spinner("Listening..."):
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4-turbo",
+            messages=[
+                {"role": "system", "content": core_prompt}
+            ] + [
+                {"role": "user", "content": msg}
+                for msg in st.session_state['reflection_history'][-4:]
+            ],
+            temperature=0.3
+        )
 
-            except Exception as e:
-                st.error(f"Something went wrong: {e}")
+        reflection = response.choices[0].message.content
 
-        if reflection:
-            st.markdown("---")
-            st.subheader("🌀 SAYCRD Reflection")
-            st.markdown(reflection)
+        # Check for reflection repetition
+        if 'previous_reflection' in st.session_state:
+            if reflection.strip() == st.session_state['previous_reflection'].strip():
+                reflection += "\n\n[Reflection was repeated. SAYCRD may need to wait instead.]"
 
-            # Symbolic logic demo: mark Offering if depth is high
-            if presence_depth >= 0.7:
-                st.session_state['altar_thread'].append("✦")
+        
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4-turbo",
+            messages=[
+                {"role": "system", "content": core_prompt}
+            ] + [
+                {"role": "user", "content": msg}
+                for msg in st.session_state['reflection_history'][-4:]
+            ],
+            temperature=0.3
+        )
 
-            st.markdown("### Raw SAYCRD Output (debug)")
-            st.code(reflection)
-            st.markdown(f"**Presence Depth:** `{presence_depth}`")
+        reflection = response.choices[0].message.content
 
-            if presence_depth >= 0.7:
-                st.success("✨ A ceremony may be ready to emerge.")
+    except Exception as e:
+        st.error(f"Something went wrong: {e}")
+        reflection = None  # just in case something fails
+
+# 🧠 Post-response logic (outside the try block)
+if reflection:
+    # Check for reflection repetition
+    if 'previous_reflection' in st.session_state:
+        if reflection.strip() == st.session_state['previous_reflection'].strip():
+            reflection += "\n\n[Reflection was repeated. SAYCRD may need to wait instead.]"
+
+    st.session_state['previous_reflection'] = reflection
+
+    st.markdown("---")
+    st.subheader("🌀 SAYCRD Reflection")
+    st.markdown(reflection)
+
+    # Symbolic logic demo: mark Offering if depth is high
+    if presence_depth >= 0.7:
+        st.session_state['altar_thread'].append("✦")
+
+    st.markdown("### Raw SAYCRD Output (debug)")
+    st.code(reflection)
+    st.markdown(f"**Presence Depth:** `{presence_depth}`")
+
+    if presence_depth >= 0.7:
+        st.success("✨ A ceremony may be ready to emerge.")
 
 # --- Altar Thread Display ---
 if st.session_state['altar_thread']:
