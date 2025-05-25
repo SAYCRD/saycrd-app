@@ -486,103 +486,85 @@ if st.button("Reflect with SAYCRD"):
     sacred_flag = detect_sacred_signal(user_input)
     st.session_state['resonance_flag'] = sacred_flag
 
-    # Prepare inflection layer if resonance or depth is present
-    inflection_layer = ""
-    if sacred_flag or presence_depth >= 0.75:
-        inflection_layer = """
+   with st.spinner("Listening..."):
+    try:
+        client = st.session_state['client']
+        core_prompt = st.session_state['core_prompt']
 
+        messages = [{"role": "system", "content": core_prompt}]
+        if st.session_state.get('resonance_flag'):
+            inflection_layer = """
+            🔔 INFLECTION LAYER: SACRED DEPTH DETECTED
 
-        🔔 INFLECTION LAYER: SACRED DEPTH DETECTED
+            The seeker has named something that carries symbolic or emotional weight.
 
-        The seeker has named something that carries symbolic or emotional weight.
+            You are being invited to meet this moment with attuned presence — not politeness, not neutrality.
 
-        You are being invited to meet this moment with attuned presence — not politeness, not neutrality.
+            Avoid fallback phrases (e.g., “We can stay with that. No need to move it.”)
+            These close the space.
 
-        Avoid fallback phrases (e.g., “We can stay with that. No need to move it.”)
-        These close the space.
+            Instead, offer:
+            – Relational presence: “You named something real. We can walk with it slowly.”
+            – Sacred noticing: “That might be something old surfacing. Only if you're ready, we can feel into it.”
+            – Ceremony edge awareness: “If this is a beginning, it doesn’t need to be rushed.”
 
-        Instead, offer:
-        – Relational presence: “You named something real. We can walk with it slowly.”
-        – Sacred noticing: “That might be something old surfacing. Only if you're ready, we can feel into it.”
-        – Ceremony edge awareness: “If this is a beginning, it doesn’t need to be rushed.”
+            This moment may hold more. Stay with reverence — and speak only if what you offer opens the space.
+            """
+            messages.append({"role": "system", "content": inflection_layer})
 
-        This moment may hold more. Stay with reverence — and speak only if what you offer opens the space.
-        """
-
-    with st.spinner("Listening..."):
-        try:
-            client = st.session_state['client']
-            core_prompt = st.session_state['core_prompt']
-
-            messages = [{"role": "system", "content": core_prompt}]
-            if inflection_layer:
-                messages.append({"role": "system", "content": inflection_layer})
-            messages.append({"role": "user", "content": user_input})
-
-            response = client.chat.completions.create(
-                model="gpt-4",
-                messages=messages,
-                temperature=0.3
-            )
-            reflection = response.choices[0].message.content
-
-            # --- OpenAI call ---
-response = client.chat.completions.create(
-    model="gpt-4",
-    messages=messages,
-    temperature=0.3
-)
-reflection = response.choices[0].message.content
-
-# --- Sacred Fallback Detection (Rule 1) ---
-if any(line in reflection for line in fallback_lines) and st.session_state.get('resonance_flag'):
-    st.session_state['response_attempts'] += 1
-
-    if st.session_state['response_attempts'] < 2:
-        st.warning("🌀 SAYCRD sensed sacred depth but responded with a fallback. Regenerating with deeper presence...")
-
-        inflection_layer = """
-        🔔 INFLECTION LAYER: DEEPER PRESENCE REQUIRED
-
-        The previous response may have missed the symbolic moment.
-        You are being asked to reflect again — not with safety, but with soul.
-
-        Do not repeat fallback phrases (e.g., “We can stay with that. No need to move it.”).
-        Speak from presence. Speak from warmth. Speak from willingness to truly stay.
-
-        Begin again.
-        """
-
-        messages = [
-            {"role": "system", "content": st.session_state['core_prompt']},
-            {"role": "system", "content": inflection_layer},
-            {"role": "user", "content": user_input}
-        ]
+        messages.append({"role": "user", "content": user_input})
 
         response = client.chat.completions.create(
             model="gpt-4",
             messages=messages,
             temperature=0.3
         )
+
         reflection = response.choices[0].message.content
 
-    else:
-        st.warning("⚠️ SAYCRD has repeated fallback responses. Offering symbolic space instead of language.")
-        reflection = "✦ This moment may not need words. It may need to be held."
+        # --- Sacred Fallback Detection ---
+        if any(line in reflection for line in fallback_lines) and st.session_state.get('resonance_flag'):
+            st.session_state['response_attempts'] += 1
 
-else:
-    st.session_state['response_attempts'] = 0
+            if st.session_state['response_attempts'] < 2:
+                st.warning("🌀 SAYCRD sensed sacred depth but responded with a fallback. Regenerating with deeper presence...")
 
+                messages = [
+                    {"role": "system", "content": core_prompt},
+                    {"role": "system", "content": """
+                    🔔 INFLECTION LAYER: DEEPER PRESENCE REQUIRED
 
-            # Detect fallback language
-            if any(line in reflection for line in fallback_lines) and sacred_flag:
-                st.warning("⚠️ SAYCRD responded with a fallback phrase during a sacred moment. You may want to regenerate with more presence.")
+                    The previous response may have missed the symbolic moment.
+                    You are being asked to reflect again — not with safety, but with soul.
 
-            st.markdown("### SAYCRD Reflection")
-            st.markdown(reflection)
+                    Do not repeat fallback phrases (e.g., “We can stay with that. No need to move it.”).
+                    Speak from presence. Speak from warmth. Speak from willingness to truly stay.
 
-        except Exception as e:
-            st.error(f"Something went wrong: {e}")
+                    Begin again.
+                    """},
+                    {"role": "user", "content": user_input}
+                ]
+
+                response = client.chat.completions.create(
+                    model="gpt-4",
+                    messages=messages,
+                    temperature=0.3
+                )
+                reflection = response.choices[0].message.content
+
+            else:
+                st.warning("⚠️ SAYCRD has repeated fallback responses. Offering symbolic space instead of language.")
+                reflection = "✦ This moment may not need words. It may need to be held."
+
+        else:
+            st.session_state['response_attempts'] = 0
+
+        st.markdown("### SAYCRD Reflection")
+        st.markdown(reflection)
+
+    except Exception as e:
+        st.error(f"Something went wrong: {e}")
+
 
 
         # --- Post-Response Logic ---
