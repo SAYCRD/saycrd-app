@@ -108,6 +108,8 @@ def simulate_presence_depth(text):
         base_score = 0.65
     elif "what do you mean" in text:
         base_score = 0.6
+    elif text in ["yes", "exactly", "still here", "ok"]:
+        return 0.7    
     elif len(text) > 250:
         base_score = 0.5
     elif len(text) > 150:
@@ -187,7 +189,8 @@ if st.button("Reflect with SAYCRD"):
         if reflection:
             if 'previous_reflection' in st.session_state:
                 if reflection.strip() == st.session_state['previous_reflection'].strip():
-                    reflection += "\n\n[Reflection was repeated. SAYCRD may need to wait instead.]"
+                    reflection = "Let’s stay with that. If you would like. Or share what else may be going on."
+
 
             st.session_state['previous_reflection'] = reflection
 
@@ -195,8 +198,11 @@ if st.button("Reflect with SAYCRD"):
             st.subheader("🌀 SAYCRD Reflection")
             st.markdown(reflection)
 
-            if presence_depth >= 0.7:
-                st.session_state['altar_thread'].append("✦")
+            # OFFERING Ceremony logic
+        if presence_depth >= 0.7 and "✦" not in st.session_state['altar_thread']:
+            st.session_state['altar_thread'].append("✦")
+            reflection += "\n\nThis may be a moment to place something on the altar. Not to fix it — just to name it as sacred. Would you like to do that?"
+
 
             st.markdown("### Raw SAYCRD Output (debug)")
             st.code(reflection)
