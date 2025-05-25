@@ -248,22 +248,22 @@ with st.spinner("Listening..."):
 
         
     try:
-        response = client.chat.completions.create(
-            model="gpt-4-turbo",
-            messages=[
-                {"role": "system", "content": core_prompt}
-            ] + [
-                {"role": "user", "content": msg}
-                for msg in st.session_state['reflection_history'][-4:]
-            ],
-            temperature=0.3
-        )
+    response = client.chat.completions.create(
+        model="gpt-4-turbo",
+        messages=[
+            {"role": "system", "content": core_prompt}
+        ] + [
+            {"role": "user", "content": msg}
+            for msg in st.session_state['reflection_history'][-4:]
+        ],
+        temperature=0.3
+    )
+    reflection = response.choices[0].message.content
 
-        reflection = response.choices[0].message.content
+except Exception as e:
+    st.error(f"Something went wrong: {e}")
+    reflection = None  # just in case something fails
 
-    except Exception as e:
-        st.error(f"Something went wrong: {e}")
-        reflection = None  # just in case something fails
 
 # 🧠 Post-response logic (outside the try block)
 if reflection:
