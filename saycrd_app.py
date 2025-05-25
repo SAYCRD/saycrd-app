@@ -555,14 +555,14 @@ if st.button("Reflect with SAYCRD"):
                 st.warning("⚠️ SAYCRD has repeated fallback responses. Offering symbolic space instead of language.")
                 reflection = "✦ This moment may not need words. It may need to be held."
 
-        else:
-            st.session_state['response_attempts'] = 0
+            else:
+                st.session_state['response_attempts'] = 0
 
-        st.markdown("### SAYCRD Reflection")
-        st.markdown(reflection)
+                st.markdown("### SAYCRD Reflection")
+                st.markdown(reflection)
 
         except Exception as e:
-        st.error(f"Something went wrong: {e}")
+            st.error(f"Something went wrong: {e}")
 
 
 
