@@ -18,6 +18,9 @@ else:
 # --- Session State Setup ---
 if 'reflections' not in st.session_state:
     st.session_state['reflections'] = 0
+if 'reflection_history' not in st.session_state:
+    st.session_state['reflection_history'] = []
+
 if 'altar_thread' not in st.session_state:
     st.session_state['altar_thread'] = []
 
@@ -219,6 +222,7 @@ if st.button("Reflect with SAYCRD"):
     else:
         presence_depth = simulate_presence_depth(user_input)
         st.session_state['reflections'] += 1
+        st.session_state['reflection_history'].append(user_input)
         reflection = None
 
         with st.spinner("Listening..."):
@@ -226,8 +230,10 @@ if st.button("Reflect with SAYCRD"):
                 response = client.chat.completions.create(
                     model="gpt-4-turbo",
                     messages=[
-                        {"role": "system", "content": core_prompt},
-                        {"role": "user", "content": user_input}
+                        {"role": "system", "content": core_prompt}
+                    ] + [
+                        {"role": "user", "content": msg}
+                        for msg in st.session_state['reflection_history'][-4:]
                     ],
                     temperature=0.3
                 )
