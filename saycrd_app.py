@@ -448,49 +448,90 @@ def simulate_presence_depth(text):
         base_score += 0.05
 
     return min(base_score, 0.9)
+    
+# --- Sacred Signal Detection + Fallback Monitoring ---
+def detect_sacred_signal(text):
+    symbolic_phrases = [
+        "again", "always", "loop", "cracking", "opening", "beneath", "surfacing",
+        "something old", "I’m scared", "I don’t know", "too much", "holding"
+    ]
+    return any(phrase in text.lower() for phrase in symbolic_phrases)
+
+fallback_lines = [
+    "We can stay with that. No need to move it.",
+    "Let’s just let that be here for now.",
+    "Tired. Thank you for bringing that."
+]
 
 # --- User Input ---
 user_input = st.text_area("What’s present for you?", height=200)
 
 # --- Run Reflection Button ---
 if st.button("Reflect with SAYCRD"):
-    if 'api_key' not in st.session_state:
-        st.warning("Please enter your OpenAI API key in the sidebar.")
-    elif user_input.strip() == "":
-        st.warning("Please enter something to reflect on.")
-    else:
-        if 'reflection_history' not in st.session_state:
-            st.session_state['reflection_history'] = []
-        if 'reflections' not in st.session_state:
-            st.session_state['reflections'] = 0
-        if 'altar_thread' not in st.session_state:
-            st.session_state['altar_thread'] = []
+    if 'reflection_history' not in st.session_state:
+        st.session_state['reflection_history'] = []
+    if 'reflections' not in st.session_state:
+        st.session_state['reflections'] = 0
 
-        presence_depth = simulate_presence_depth(user_input)
-        st.session_state['presence_depth'] = presence_depth
-        st.session_state['reflections'] += 1
-        st.session_state['reflection_history'].append(user_input)
-        reflection = None
+    presence_depth = simulate_presence_depth(user_input)
+    st.session_state['presence_depth'] = presence_depth
+    st.session_state['reflections'] += 1
+    st.session_state['reflection_history'].append(user_input)
 
-        with st.spinner("Listening..."):
-            try:
-                client = st.session_state['client']
-                core_prompt = st.session_state['core_prompt']
-                response = client.chat.completions.create(
-                    model="gpt-4-turbo",
-                    messages=[
-                        {"role": "system", "content": core_prompt}
-                    ] + [
-                        {"role": "user", "content": msg}
-                        for msg in st.session_state['reflection_history'][-4:]
-                    ],
-                    temperature=0.3
-                )
-                reflection = response.choices[0].message.content
+    # Detect sacred resonance
+    sacred_flag = detect_sacred_signal(user_input)
+    st.session_state['resonance_flag'] = sacred_flag
 
-            except Exception as e:
-                st.error(f"Something went wrong: {e}")
-                reflection = None
+    # Prepare inflection layer if resonance or depth is present
+    inflection_layer = ""
+    if sacred_flag or presence_depth >= 0.75:
+        inflection_layer = """
+
+
+        🔔 INFLECTION LAYER: SACRED DEPTH DETECTED
+
+        The seeker has named something that carries symbolic or emotional weight.
+
+        You are being invited to meet this moment with attuned presence — not politeness, not neutrality.
+
+        Avoid fallback phrases (e.g., “We can stay with that. No need to move it.”)
+        These close the space.
+
+        Instead, offer:
+        – Relational presence: “You named something real. We can walk with it slowly.”
+        – Sacred noticing: “That might be something old surfacing. Only if you're ready, we can feel into it.”
+        – Ceremony edge awareness: “If this is a beginning, it doesn’t need to be rushed.”
+
+        This moment may hold more. Stay with reverence — and speak only if what you offer opens the space.
+        """
+
+    with st.spinner("Listening..."):
+        try:
+            client = st.session_state['client']
+            core_prompt = st.session_state['core_prompt']
+
+            messages = [{"role": "system", "content": core_prompt}]
+            if inflection_layer:
+                messages.append({"role": "system", "content": inflection_layer})
+            messages.append({"role": "user", "content": user_input})
+
+            response = client.chat.completions.create(
+                model="gpt-4-turbo",
+                messages=messages,
+                temperature=0.3
+            )
+            reflection = response.choices[0].message.content
+
+            # Detect fallback language
+            if any(line in reflection for line in fallback_lines) and sacred_flag:
+                st.warning("⚠️ SAYCRD responded with a fallback phrase during a sacred moment. You may want to regenerate with more presence.")
+
+            st.markdown("### SAYCRD Reflection")
+            st.markdown(reflection)
+
+        except Exception as e:
+            st.error(f"Something went wrong: {e}")
+
 
         # --- Post-Response Logic ---
         if reflection:
