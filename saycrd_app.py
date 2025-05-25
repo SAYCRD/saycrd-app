@@ -450,17 +450,43 @@ if st.button("Reflect with SAYCRD"):
 
 
         # --- Reflection Output ---
-        if reflection:
-            if 'previous_reflection' in st.session_state:
-                if reflection.strip() == st.session_state['previous_reflection'].strip():
-                    reflection = "Let’s stay with that. If you would like. Or share what else may be going on."
+       if reflection:
+    # 🔁 Repetition Detection
+    if 'previous_reflection' in st.session_state:
+        if reflection.strip() == st.session_state['previous_reflection'].strip():
+            st.session_state['response_attempts'] += 1
+            if st.session_state['response_attempts'] < 2:
+                reflection += "\n\n🌀 SAYCRD sensed sacred repetition. Let’s slow down. Something deeper may be beneath this."
+            else:
+                reflection = "🌀 We’ve mirrored this space fully. Let’s pause and feel what else may want to be spoken."
+                st.session_state['response_attempts'] = 0
+        else:
+            st.session_state['response_attempts'] = 0  # reset on successful variation
 
+    # 💎 Teaching Injection (always append if missing)
+    if "✦ SAYCRD Teaching:" not in reflection:
+        reflection += "\n\n✦ SAYCRD Teaching: Sometimes presence means not naming it. Just letting it stay and soften."
 
-            st.session_state['previous_reflection'] = reflection
+    # 🔁 Store reflection
+    st.session_state['previous_reflection'] = reflection
 
-            st.markdown("---")
-            st.subheader("🌀 SAYCRD Reflection")
-            st.markdown(reflection)
+    # 🧭 Reflection Display
+    st.markdown("---")
+    st.subheader("🌀 SAYCRD Reflection")
+    st.markdown(reflection)
+
+    # 🔮 Echo Shift Detection (optional altar thread marking)
+    def detect_echo_shift(text):
+        echo_markers = [
+            "i feel lighter", "something shifted", "i didn’t expect that",
+            "that really helped", "i’ve never said that before", "something moved"
+        ]
+        return any(phrase in text.lower() for phrase in echo_markers)
+
+    if detect_echo_shift(reflection):
+        st.session_state['altar_thread'].append("↯")
+        st.success("↯ A resonance shift was felt and added to the altar thread.")
+
 
         if st.session_state['thread_log']:
             st.markdown("---")
