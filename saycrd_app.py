@@ -173,22 +173,34 @@ def simulate_presence_depth(text):
     
     medium_signals = [
         "i’m tired", "i feel off", "i’m unsure", "it’s been hard", "i'm trying", "i feel stuck",
-        "things on my mind", "can you help", "wondering if", "start again", "i’m holding a lot"
+        "things on my mind", "can you help", "wondering if", "start again",
+        "frustration", "feeling frustrated", "i feel frustrated"
     ]
-    
-    # Check for deep signal matches
+
+    reflections = st.session_state.get('reflections', 0)
+
     if any(phrase in text for phrase in deep_signals):
-        return 0.85
+        base_score = 0.85
     elif any(phrase in text for phrase in medium_signals):
-        return 0.65
+        base_score = 0.65
     elif "what do you mean" in text:
-        return 0.6
+        base_score = 0.6
     elif len(text) > 250:
-        return 0.5
+        base_score = 0.5
     elif len(text) > 150:
-        return 0.4
+        base_score = 0.4
     else:
-        return 0.2
+        base_score = 0.2
+
+    # Boost based on how many reflections have occurred
+    if reflections >= 8:
+        base_score += 0.15
+    elif reflections >= 5:
+        base_score += 0.10
+    elif reflections >= 3:
+        base_score += 0.05
+
+    return min(base_score, 0.9)
 
 
 # --- Input Box ---
