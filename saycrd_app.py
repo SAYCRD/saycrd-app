@@ -29,6 +29,9 @@ if 'reflection_history' not in st.session_state:
 
 if 'altar_thread' not in st.session_state:
     st.session_state['altar_thread'] = []
+    
+if 'core_prompt' not in st.session_state:
+    st.session_state['core_prompt'] = core_prompt
 
 # --- SAYCRD Prompt v5.7 ---
 core_prompt = """
