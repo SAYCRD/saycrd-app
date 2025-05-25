@@ -425,7 +425,7 @@ if st.button("Reflect with SAYCRD"):
         with st.spinner("Listening..."):
             try:
                 response = client.chat.completions.create(
-                    model="gpt-4-turbo",,
+                    model="gpt-4-turbo",
                     messages=[
                         {"role": "system", "content": core_prompt},
                         {"role": "user", "content": user_input}
