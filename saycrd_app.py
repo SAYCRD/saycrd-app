@@ -450,7 +450,7 @@ if st.button("Reflect with SAYCRD"):
 
 
         # --- Reflection Output ---
-if reflection:
+if 'reflection' in locals() and reflection:
     # 🔁 Repetition Detection
     if 'previous_reflection' in st.session_state:
         if reflection.strip() == st.session_state['previous_reflection'].strip():
