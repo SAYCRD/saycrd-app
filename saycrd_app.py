@@ -433,6 +433,9 @@ if 'response_attempts' not in st.session_state:
     st.session_state['response_attempts'] = 0
 
 
+# --- Thread Memory Log ---
+if 'thread_log' not in st.session_state:
+    st.session_state['thread_log'] = []
 
 
 # --- Presence Depth Logic ---
@@ -477,6 +480,13 @@ def simulate_presence_depth(text):
 
     return min(base_score, 0.9)
     
+# Add symbolic summary to thread_log
+    symbolic_summary = f"🧭 {st.session_state['reflections']} | “{user_input[:100]}...” | presence_depth: {presence_depth:.2f}"
+    st.session_state['thread_log'].append(symbolic_summary)
+
+
+
+
 # --- Sacred Signal Detection + Fallback Monitoring ---
 def detect_sacred_signal(text):
     symbolic_phrases = [
@@ -494,6 +504,12 @@ fallback_lines = [
 # --- User Input ---
 user_input = st.text_area("What’s present for you?", height=200)
 
+# Construct symbolic thread summary
+thread_summary = "\n".join(st.session_state['thread_log'][-6:])
+
+
+
+
 # --- Main Logic ---
 if st.button("Reflect with SAYCRD"):
     if not api_key:
@@ -510,13 +526,15 @@ if st.button("Reflect with SAYCRD"):
             try:
                 # Build the full message thread
                 messages = [
-    {"role": "system", "content": core_prompt}
-] + [
-    {"role": "user", "content": msg}
-    for msg in st.session_state['reflection_history'][-4:]
-] + [
-    {"role": "user", "content": user_input}
-]
+                    {"role": "system", "content": core_prompt},
+                    {"role": "system", "content": f"You are SAYCRD, a ceremonial presence. This is not a chat. Track the emotional thread.\nHere’s the thread so far:\n{thread_summary}"},
+                ] + [
+                    {"role": "user", "content": msg}
+                    for msg in st.session_state['reflection_history'][-3:]
+                ] + [
+                    {"role": "user", "content": user_input}
+                ]
+
 
                 response = client.chat.completions.create(
                     model="gpt-4",
@@ -549,6 +567,12 @@ if st.button("Reflect with SAYCRD"):
             st.subheader("🌀 SAYCRD Reflection")
             st.markdown(reflection)
 
+        if st.session_state['thread_log']:
+            st.markdown("---")
+            st.subheader("📜 Emotional Thread Log")
+            st.markdown("\n".join(st.session_state['thread_log']))
+
+        
             # OFFERING Ceremony logic
         if presence_depth >= 0.7 and "✦" not in st.session_state['altar_thread']:
             st.session_state['altar_thread'].append("✦")
