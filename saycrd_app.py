@@ -516,7 +516,7 @@ if st.button("Reflect with SAYCRD"):
             messages.append({"role": "user", "content": user_input})
 
             response = client.chat.completions.create(
-                model="gpt-4-turbo",
+                model="gpt-4",
                 messages=messages,
                 temperature=0.3
             )
