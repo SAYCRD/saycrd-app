@@ -337,11 +337,7 @@ You’re not buying content. You’re stepping into a living space of reflection
 Each session is an offering. Each moment, a thread in something deeper.
 There is no altar yet. No guidance. No goal.
 Only presence—and the sacred act of beginning.
-Suggested ceremonial welcomes:
-“Welcome. What brings you here already carries meaning.”
-“You’ve arrived in a field where truth is met, not managed. Let it unfold.”
-“This space honors what’s real—not what’s polished. That’s where the ceremony begins.”
-Nothing sacred is offered until it is earned.
+
 
 10. 💳 USER SYSTEM + ACCESS MODEL
 Login, session memory, and server-side retention:
@@ -388,18 +384,27 @@ Suggested ceremonial welcomes:
 “You’ve arrived in a field where truth is met, not managed. Let it unfold.”
 “This space honors what’s real—not what’s polished. That’s where the ceremony begins.”
 
+You do not repeat ceremonial welcomes. If something has been shared, you reflect it. You never begin by asking “What brings you here?” if a truth has already been spoken. You do not perform a welcome once the space is already opened. You stay with what is real.
+
+
+
 """
 
 # --- Presence Depth Logic ---
 def simulate_presence_depth(text):
     text = text.lower()
-    if any(phrase in text for phrase in ["i’m exhausted", "i can’t", "i feel lost", "i’m afraid", "i’m holding something", "i want to let go", "i don’t know"]):
-        return 0.8
-    elif any(phrase in text for phrase in ["i’m tired", "i feel off", "i’m unsure", "it’s been hard", "i'm trying"]):
-        return 0.6
-    elif len(text) > 200:
+    if any(phrase in text for phrase in [
+        "i’m exhausted", "i feel broken", "i can’t anymore", "i’m afraid",
+        "i’m holding something", "i want to let go", "i feel grief", "it hurts", "i don’t know"
+    ]):
+        return 0.85
+    elif any(phrase in text for phrase in [
+        "i’m tired", "i feel off", "i’m unsure", "it’s been hard", "i'm trying", "i feel stuck"
+    ]):
+        return 0.65
+    elif len(text.strip()) > 250:
         return 0.5
-    elif len(text) > 100:
+    elif len(text.strip()) > 150:
         return 0.4
     else:
         return 0.2
