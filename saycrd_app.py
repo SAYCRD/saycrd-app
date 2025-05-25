@@ -470,42 +470,28 @@ fallback_lines = [
 # --- User Input ---
 user_input = st.text_area("What’s present for you?", height=200)
 
-# --- Run Reflection Button ---
+# --- Main Logic ---
 if st.button("Reflect with SAYCRD"):
-    if 'reflection_history' not in st.session_state:
-        st.session_state['reflection_history'] = []
-    if 'reflections' not in st.session_state:
-        st.session_state['reflections'] = 0
+    if not api_key:
+        st.warning("Please enter your OpenAI API key in the sidebar.")
+    elif user_input.strip() == "":
+        st.warning("Please enter something to reflect on.")
+    else:
+        presence_depth = simulate_presence_depth(user_input)
+        st.session_state['reflections'] += 1
+        st.session_state['reflection_history'].append(user_input)
+        reflection = None
 
-    presence_depth = simulate_presence_depth(user_input)
-    st.session_state['presence_depth'] = presence_depth
-    st.session_state['reflections'] += 1
-    st.session_state['reflection_history'].append(user_input)
-
-    sacred_flag = detect_sacred_signal(user_input)
-    st.session_state['resonance_flag'] = sacred_flag
-
-    with st.spinner("Listening..."):
-        try:
-            # GPT-4 call
-            response = client.chat.completions.create(
-                model="gpt-4",
-                messages=messages,
-                temperature=0.3
-            )
-            reflection = response.choices[0].message.content
-
-
-        # --- Sacred Fallback Detection ---
-            if any(line in reflection for line in fallback_lines) and st.session_state.get('resonance_flag'):
-                st.session_state['response_attempts'] += 1
-
-                if st.session_state['response_attempts'] < 2:
-                    st.warning("🌀 SAYCRD sensed sacred depth but responded with a fallback. Regenerating with deeper presence...")
-
-                    messages = [
-                        {"role": "system", "content": core_prompt},
-                        {"role": "system", "content": """
+        with st.spinner("Listening..."):
+            try:
+                # Build the full message thread
+                messages = [
+                    {"role": "system", "content": core_prompt}
+                ] + [
+                    {"role": "user", "content": msg}
+                    for msg in st.session_state['reflection_history'][-4:]
+                ] + [
+                    {"role": "system", "content": """
 🔔 INFLECTION LAYER: DEEPER PRESENCE REQUIRED
 
 The previous response may have missed the symbolic moment.
@@ -557,5 +543,3 @@ if 'altar_thread' in st.session_state and st.session_state['altar_thread']:
     st.markdown("---")
     st.subheader("🕯️ Altar Thread")
     st.markdown(" ".join(st.session_state['altar_thread']))
-
-
