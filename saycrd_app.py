@@ -163,27 +163,33 @@ Includes:
 
 # --- Presence Depth Logic ---
 def simulate_presence_depth(text):
-    text = text.lower()
+    text = text.lower().strip()
+    
     deep_signals = [
         "i’m exhausted", "i feel broken", "i can’t anymore", "i’m afraid",
-        "i’m holding something", "i want to let go", "i feel grief", "it hurts", "i don’t know"
+        "i’m holding something", "i want to let go", "i feel grief", "it hurts", "i don’t know",
+        "i feel like i’m collapsing", "i’m overwhelmed", "i’m not okay", "i feel raw"
     ]
+    
     medium_signals = [
         "i’m tired", "i feel off", "i’m unsure", "it’s been hard", "i'm trying", "i feel stuck",
-        "things on my mind", "can you help", "wondering if", "start again"
+        "things on my mind", "can you help", "wondering if", "start again", "i’m holding a lot"
     ]
+    
+    # Check for deep signal matches
     if any(phrase in text for phrase in deep_signals):
         return 0.85
     elif any(phrase in text for phrase in medium_signals):
         return 0.65
     elif "what do you mean" in text:
         return 0.6
-    elif len(text.strip()) > 250:
+    elif len(text) > 250:
         return 0.5
-    elif len(text.strip()) > 150:
+    elif len(text) > 150:
         return 0.4
     else:
         return 0.2
+
 
 # --- Input Box ---
 user_input = st.text_area("What’s present for you?", height=200)
