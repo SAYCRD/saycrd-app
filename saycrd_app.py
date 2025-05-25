@@ -551,9 +551,9 @@ if st.button("Reflect with SAYCRD"):
                 )
                 reflection = response.choices[0].message.content
 
-            else:
-                st.warning("⚠️ SAYCRD has repeated fallback responses. Offering symbolic space instead of language.")
-                reflection = "✦ This moment may not need words. It may need to be held."
+                else:
+                    st.warning("⚠️ SAYCRD has repeated fallback responses. Offering symbolic space instead of language.")
+                    reflection = "✦ This moment may not need words. It may need to be held."
 
             else:
                 st.session_state['response_attempts'] = 0
