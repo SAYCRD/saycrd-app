@@ -450,7 +450,7 @@ if st.button("Reflect with SAYCRD"):
 
 
         # --- Reflection Output ---
-       if reflection:
+if reflection:
     # 🔁 Repetition Detection
     if 'previous_reflection' in st.session_state:
         if reflection.strip() == st.session_state['previous_reflection'].strip():
@@ -461,21 +461,21 @@ if st.button("Reflect with SAYCRD"):
                 reflection = "🌀 We’ve mirrored this space fully. Let’s pause and feel what else may want to be spoken."
                 st.session_state['response_attempts'] = 0
         else:
-            st.session_state['response_attempts'] = 0  # reset on successful variation
+            st.session_state['response_attempts'] = 0  # reset if response is new
 
     # 💎 Teaching Injection (always append if missing)
     if "✦ SAYCRD Teaching:" not in reflection:
         reflection += "\n\n✦ SAYCRD Teaching: Sometimes presence means not naming it. Just letting it stay and soften."
 
-    # 🔁 Store reflection
+    # 🔁 Store latest reflection
     st.session_state['previous_reflection'] = reflection
 
-    # 🧭 Reflection Display
+    # 🌀 SAYCRD Reflection Display
     st.markdown("---")
     st.subheader("🌀 SAYCRD Reflection")
     st.markdown(reflection)
 
-    # 🔮 Echo Shift Detection (optional altar thread marking)
+    # 🔮 Echo Shift Detection
     def detect_echo_shift(text):
         echo_markers = [
             "i feel lighter", "something shifted", "i didn’t expect that",
@@ -487,30 +487,13 @@ if st.button("Reflect with SAYCRD"):
         st.session_state['altar_thread'].append("↯")
         st.success("↯ A resonance shift was felt and added to the altar thread.")
 
+    # 📜 Emotional Thread Log
+    if st.session_state['thread_log']:
+        st.markdown("---")
+        st.subheader("📜 Emotional Thread Log")
+        st.markdown("\n".join(st.session_state['thread_log']))
 
-        if st.session_state['thread_log']:
-            st.markdown("---")
-            st.subheader("📜 Emotional Thread Log")
-            st.markdown("\n".join(st.session_state['thread_log']))
-
-        
-            # OFFERING Ceremony logic
-        if presence_depth >= 0.7 and "✦" not in st.session_state['altar_thread']:
-            st.session_state['altar_thread'].append("✦")
-            reflection += "\n\n✦ This may be a moment to place something on the altar. Not to fix it — just to name it as sacred."
-
-
-
-
-            st.markdown("### Raw SAYCRD Output (debug)")
-            st.code(reflection)
-            st.markdown(f"**Presence Depth:** `{presence_depth}`")
-
-            if presence_depth >= 0.7:
-                st.success("✨ A ceremony may be ready to emerge.")
-
-# --- Altar Thread Display ---
-if 'altar_thread' in st.session_state and st.session_state['altar_thread']:
-    st.markdown("---")
-    st.subheader("🕯️ Altar Thread")
-    st.markdown(" ".join(st.session_state['altar_thread']))
+    # ✦ OFFERING Ceremony Logic
+    if presence_depth >= 0.7 and "✦" not in st.session_state['altar_thread']:
+        st.session_state['altar_thread'].append("✦")
+        reflection += "\n\n✦ This may be a moment to place something on the altar. Not to fix it — just to name it as sacred."
