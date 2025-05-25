@@ -1,6 +1,6 @@
 import streamlit as st
 
-# ✅ Must be the very first Streamlit command
+# ✅ This must be the first Streamlit call
 st.set_page_config(
     page_title="SAYCRD – Sacred Reflection Engine",
     layout="centered"
@@ -15,6 +15,7 @@ if api_key:
     import openai
     openai.api_key = api_key
     st.session_state['client'] = openai
+
 
 # --- SETUP ---
 st.set_page_config(page_title="SAYCRD – Sacred Reflection Engine", layout="centered")
