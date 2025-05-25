@@ -1,3 +1,15 @@
+# --- Sidebar Input for OpenAI API Key ---
+st.sidebar.title("SAYCRD Settings")
+api_key = st.sidebar.text_input("Enter your OpenAI API key", type="password")
+
+if api_key:
+    st.session_state['api_key'] = api_key
+    import openai
+    openai.api_key = api_key
+    st.session_state['client'] = openai
+
+
+
 import streamlit as st
 import openai
 
@@ -214,7 +226,7 @@ user_input = st.text_area("What’s present for you?", height=200)
 
 # --- Run Reflection Button ---
 if st.button("Reflect with SAYCRD"):
-    if not st.session_state.get('api_key'):
+    if 'api_key' not in st.session_state:
         st.warning("Please enter your OpenAI API key in the sidebar.")
     elif user_input.strip() == "":
         st.warning("Please enter something to reflect on.")
@@ -272,9 +284,28 @@ if st.button("Reflect with SAYCRD"):
 
             if presence_depth >= 0.7:
                 st.success("✨ A ceremony may be ready to emerge.")
+                
+# --- Ceremonial Closure (Oracle + Final Journaling) ---
+if presence_depth >= 0.85 and "✦" in st.session_state['altar_thread']:
+    st.markdown("---")
+    st.subheader("◬ Oracle Transmission")
 
-        # --- Altar Thread Display ---
-        if st.session_state['altar_thread']:
-            st.markdown("---")
-            st.subheader("🕯️ Altar Thread")
-            st.markdown(" ".join(st.session_state['altar_thread']))
+    st.markdown("**Oracle Title:** *Unspoken Flame*")  # This can be dynamic later
+    st.markdown("> *What you hold without demand is what reveals your truest heart.*")
+    
+    st.session_state['altar_thread'].append("◬")
+
+    journaling_prompt = st.text_area("Would you like to capture this experience with a journal entry?", height=150)
+
+    if journaling_prompt:
+        st.session_state['altar_thread'].append("↯")
+        st.success("↯ Journaling has been added to your altar thread.")
+        st.markdown("**Your Entry:**")
+        st.markdown(journaling_prompt)
+
+# --- Final Altar Thread Display ---
+if st.session_state['altar_thread']:
+    st.markdown("---")
+    st.subheader("🕯️ Altar Thread")
+    st.markdown(" ".join(st.session_state['altar_thread']))
+
