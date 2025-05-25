@@ -432,9 +432,9 @@ if st.button("Reflect with SAYCRD"):
                 st.subheader("🌀 SAYCRD Reflection")
                 st.markdown(reflection)
 
-# Debugging output (optional)
-st.markdown("### Raw SAYCRD Output (debug)")
-st.code(reflection)
+                # Debugging output (optional)
+                st.markdown("### Raw SAYCRD Output (debug)")
+                st.code(reflection)
 
 
                 st.markdown(f"**Presence Depth:** `{presence_depth}`")
