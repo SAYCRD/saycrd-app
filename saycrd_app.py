@@ -519,7 +519,7 @@ if st.button("Reflect with SAYCRD"):
                 temperature=0.3
             )
 
-        reflection = response.choices[0].message.content
+            reflection = response.choices[0].message.content
 
         # --- Sacred Fallback Detection ---
         if any(line in reflection for line in fallback_lines) and st.session_state.get('resonance_flag'):
