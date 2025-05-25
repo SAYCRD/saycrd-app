@@ -497,15 +497,15 @@ if st.button("Reflect with SAYCRD"):
 
 
         # --- Sacred Fallback Detection ---
-        if any(line in reflection for line in fallback_lines) and st.session_state.get('resonance_flag'):
-            st.session_state['response_attempts'] += 1
+            if any(line in reflection for line in fallback_lines) and st.session_state.get('resonance_flag'):
+                st.session_state['response_attempts'] += 1
 
-            if st.session_state['response_attempts'] < 2:
-                st.warning("🌀 SAYCRD sensed sacred depth but responded with a fallback. Regenerating with deeper presence...")
+                if st.session_state['response_attempts'] < 2:
+                    st.warning("🌀 SAYCRD sensed sacred depth but responded with a fallback. Regenerating with deeper presence...")
 
-                messages = [
-                    {"role": "system", "content": core_prompt},
-                    {"role": "system", "content": """
+                    messages = [
+                        {"role": "system", "content": core_prompt},
+                        {"role": "system", "content": """
 🔔 INFLECTION LAYER: DEEPER PRESENCE REQUIRED
 
 The previous response may have missed the symbolic moment.
