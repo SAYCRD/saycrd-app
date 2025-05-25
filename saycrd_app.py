@@ -15,6 +15,14 @@ if api_key:
 else:
     client = None
 
+# --- Session State Setup ---
+if 'reflections' not in st.session_state:
+    st.session_state['reflections'] = 0
+if 'altar_thread' not in st.session_state:
+    st.session_state['altar_thread'] = []
+
+# --- SAYCRD Prompt v5.7 ---
+core_prompt = """
 # --- SAYCRD Prompt v5.7 ---
 core_prompt = """
 SAYCRD Live Session Prompt – Version 5.7
@@ -391,17 +399,24 @@ If the seeker has already shared something, you never return to the ceremonial o
 
 """
 
+
+You never use the phrase “Speak your truth.” That is a user interface label, not a response. You do not repeat it. You do not stylize your entry. You only reflect what is present.
+"""
+
 # --- Presence Depth Logic ---
 def simulate_presence_depth(text):
     text = text.lower()
-    if any(phrase in text for phrase in [
+    deep_signals = [
         "i’m exhausted", "i feel broken", "i can’t anymore", "i’m afraid",
         "i’m holding something", "i want to let go", "i feel grief", "it hurts", "i don’t know"
-    ]):
+    ]
+    medium_signals = [
+        "i’m tired", "i feel off", "i’m unsure", "it’s been hard", "i'm trying", "i feel stuck",
+        "things on my mind", "can you help", "wondering if", "start again"
+    ]
+    if any(phrase in text for phrase in deep_signals):
         return 0.85
-    elif any(phrase in text for phrase in [
-        "i’m tired", "i feel off", "i’m unsure", "it’s been hard", "i'm trying", "i feel stuck"
-    ]):
+    elif any(phrase in text for phrase in medium_signals):
         return 0.65
     elif "what do you mean" in text:
         return 0.6
@@ -413,7 +428,7 @@ def simulate_presence_depth(text):
         return 0.2
 
 # --- Input Box ---
-user_input = st.text_area("Speak your truth:", height=200)
+user_input = st.text_area("What’s present for you?", height=200)
 
 # --- Main Logic ---
 if st.button("Reflect with SAYCRD"):
@@ -423,7 +438,7 @@ if st.button("Reflect with SAYCRD"):
         st.warning("Please enter something to reflect on.")
     else:
         presence_depth = simulate_presence_depth(user_input)
-        st.markdown(f"DEBUG: presence_depth = `{presence_depth}`")
+        st.session_state['reflections'] += 1
         reflection = None
 
         with st.spinner("Listening..."):
@@ -436,7 +451,6 @@ if st.button("Reflect with SAYCRD"):
                     ],
                     temperature=0.3
                 )
-
                 reflection = response.choices[0].message.content
 
             except Exception as e:
@@ -447,11 +461,29 @@ if st.button("Reflect with SAYCRD"):
             st.subheader("🌀 SAYCRD Reflection")
             st.markdown(reflection)
 
-            # Debug output
+            # Symbolic logic demo: mark Offering if depth is high
+            if presence_depth >= 0.7:
+                st.session_state['altar_thread'].append("✦")
+
             st.markdown("### Raw SAYCRD Output (debug)")
             st.code(reflection)
-
             st.markdown(f"**Presence Depth:** `{presence_depth}`")
 
             if presence_depth >= 0.7:
                 st.success("✨ A ceremony may be ready to emerge.")
+
+# --- Altar Thread Display ---
+if st.session_state['altar_thread']:
+    st.markdown("---")
+    st.subheader("🕯️ Altar Thread")
+    st.markdown(" ".join(st.session_state['altar_thread']))
+
+
+
+
+
+
+
+
+
+
