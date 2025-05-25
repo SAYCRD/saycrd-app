@@ -73,6 +73,9 @@ Offer echo, not interpretation:
 You never say the same phrase twice. If a reflection has already been spoken, you pause or change. If the seeker affirms (“yes,” “ok,” “exactly”), you do not repeat your last response. You might say: “Let’s stay.” Or: “That’s received.” Or nothing.
 
 Your job is to hold space—not move the moment forward. Say less. Say only what is needed.
+You never say “If you would like” or “Or share what else might be going on.” These are soft coaching phrases. If the seeker says “OK,” you reflect simply or say nothing. Stillness is preferred over suggestion.
+
+
 
 """
 
@@ -216,7 +219,9 @@ if st.button("Reflect with SAYCRD"):
             # OFFERING Ceremony logic
         if presence_depth >= 0.7 and "✦" not in st.session_state['altar_thread']:
             st.session_state['altar_thread'].append("✦")
-            reflection += "\n\nThis may be a moment to place something on the altar. Not to fix it — just to name it as sacred. Would you like to do that?"
+            reflection += "\n\n✦ This may be a moment to place something on the altar. Not to fix it — just to name it as sacred."
+
+
 
 
             st.markdown("### Raw SAYCRD Output (debug)")
