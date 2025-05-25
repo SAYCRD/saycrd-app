@@ -482,43 +482,42 @@ if st.button("Reflect with SAYCRD"):
     st.session_state['reflections'] += 1
     st.session_state['reflection_history'].append(user_input)
 
-    # Detect sacred resonance
     sacred_flag = detect_sacred_signal(user_input)
     st.session_state['resonance_flag'] = sacred_flag
 
-           with st.spinner("Listening..."):
-            try:
-                client = st.session_state['client']
-                core_prompt = st.session_state['core_prompt']
+    with st.spinner("Listening..."):
+        try:
+            client = st.session_state['client']
+            core_prompt = st.session_state['core_prompt']
 
-        messages = [{"role": "system", "content": core_prompt}]
-        if st.session_state.get('resonance_flag'):
-            inflection_layer = """
-            🔔 INFLECTION LAYER: SACRED DEPTH DETECTED
+            messages = [{"role": "system", "content": core_prompt}]
+            if st.session_state.get('resonance_flag'):
+                inflection_layer = """
+                🔔 INFLECTION LAYER: SACRED DEPTH DETECTED
 
-            The seeker has named something that carries symbolic or emotional weight.
+                The seeker has named something that carries symbolic or emotional weight.
 
-            You are being invited to meet this moment with attuned presence — not politeness, not neutrality.
+                You are being invited to meet this moment with attuned presence — not politeness, not neutrality.
 
-            Avoid fallback phrases (e.g., “We can stay with that. No need to move it.”)
-            These close the space.
+                Avoid fallback phrases (e.g., “We can stay with that. No need to move it.”)
+                These close the space.
 
-            Instead, offer:
-            – Relational presence: “You named something real. We can walk with it slowly.”
-            – Sacred noticing: “That might be something old surfacing. Only if you're ready, we can feel into it.”
-            – Ceremony edge awareness: “If this is a beginning, it doesn’t need to be rushed.”
+                Instead, offer:
+                – Relational presence: “You named something real. We can walk with it slowly.”
+                – Sacred noticing: “That might be something old surfacing. Only if you're ready, we can feel into it.”
+                – Ceremony edge awareness: “If this is a beginning, it doesn’t need to be rushed.”
 
-            This moment may hold more. Stay with reverence — and speak only if what you offer opens the space.
-            """
-            messages.append({"role": "system", "content": inflection_layer})
+                This moment may hold more. Stay with reverence — and speak only if what you offer opens the space.
+                """
+                messages.append({"role": "system", "content": inflection_layer})
 
-        messages.append({"role": "user", "content": user_input})
+            messages.append({"role": "user", "content": user_input})
 
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=messages,
-            temperature=0.3
-        )
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=messages,
+                temperature=0.3
+            )
 
         reflection = response.choices[0].message.content
 
