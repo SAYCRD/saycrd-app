@@ -502,8 +502,12 @@ if st.button("Reflect with SAYCRD"):
                 reflection = response.choices[0].message.content
 
             except Exception as e:
-                st.warning("⚠️ SAYCRD has repeated fallback responses. Offering symbolic space instead of language.")
+                st.error(f"⚠️ GPT call failed: {e}")
+                reflection = None
+        # Fallback if GPT didn’t return a reflection
+            if reflection is None:
                 reflection = "✦ This moment may not need words. It may need to be held."
+
 
         # --- Reflection Output ---
         if reflection:
