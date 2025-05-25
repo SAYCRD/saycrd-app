@@ -486,8 +486,8 @@ if st.button("Reflect with SAYCRD"):
     sacred_flag = detect_sacred_signal(user_input)
     st.session_state['resonance_flag'] = sacred_flag
 
-   with st.spinner("Listening..."):
-    try:
+       with st.spinner("Listening..."):
+        try:
         client = st.session_state['client']
         core_prompt = st.session_state['core_prompt']
 
