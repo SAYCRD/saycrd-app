@@ -502,13 +502,16 @@ if st.button("Reflect with SAYCRD"):
                     temperature=0.3
                 )
                 reflection = response.choices[0].message.content
+                print("Extracted reflection:", reflection)
+
 
             except Exception as e:
                 st.error(f"⚠️ GPT call failed: {e}")
                 reflection = None
         # Fallback if GPT didn’t return a reflection
-            if reflection is None:
-                reflection = "✦ This moment may not need words. It may need to be held."
+            if not reflection or reflection.strip() == "":
+                reflection = "✦ Thank you for sharing that.  Moments like this can be held and felt.  Or we can go deeper with what's present.  It's up to you?"
+
 
 
         # --- Reflection Output ---
