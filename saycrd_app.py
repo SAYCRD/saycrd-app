@@ -523,7 +523,7 @@ if st.button("Reflect with SAYCRD"):
 
         # --- Sacred Fallback Detection ---
             if any(line in reflection for line in fallback_lines) and st.session_state.get('resonance_flag'):
-            st.session_state['response_attempts'] += 1
+                st.session_state['response_attempts'] += 1
 
             if st.session_state['response_attempts'] < 2:
                 st.warning("🌀 SAYCRD sensed sacred depth but responded with a fallback. Regenerating with deeper presence...")
