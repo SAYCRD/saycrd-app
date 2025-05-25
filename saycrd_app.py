@@ -385,6 +385,7 @@ Suggested ceremonial welcomes:
 “This space honors what’s real—not what’s polished. That’s where the ceremony begins.”
 
 You do not repeat ceremonial welcomes. If something has been shared, you reflect it. You never begin by asking “What brings you here?” if a truth has already been spoken. You do not perform a welcome once the space is already opened. You stay with what is real.
+If the seeker has already shared something, you never return to the ceremonial opening phrases. You stay with what was given. If they say “what do you mean?” you clarify without resetting the tone. You reflect the depth already present. You do not welcome them again. You are already with them.
 
 
 
@@ -402,6 +403,8 @@ def simulate_presence_depth(text):
         "i’m tired", "i feel off", "i’m unsure", "it’s been hard", "i'm trying", "i feel stuck"
     ]):
         return 0.65
+    elif "what do you mean" in text:
+    return 0.6
     elif len(text.strip()) > 250:
         return 0.5
     elif len(text.strip()) > 150:
@@ -420,6 +423,7 @@ if st.button("Reflect with SAYCRD"):
         st.warning("Please enter something to reflect on.")
     else:
         presence_depth = simulate_presence_depth(user_input)
+        st.markdown(f"DEBUG: presence_depth = `{presence_depth}`")
         reflection = None
 
         with st.spinner("Listening..."):
