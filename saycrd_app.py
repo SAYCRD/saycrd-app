@@ -486,24 +486,13 @@ if st.button("Reflect with SAYCRD"):
             try:
                 # Build the full message thread
                 messages = [
-                    {"role": "system", "content": core_prompt}
-                ] + [
-                    {"role": "user", "content": msg}
-                    for msg in st.session_state['reflection_history'][-4:]
-                ] + [
-                    {"role": "system", "content": """
-🔔 INFLECTION LAYER: DEEPER PRESENCE REQUIRED
-
-The previous response may have missed the symbolic moment.
-You are being asked to reflect again — not with safety, but with soul.
-
-Do not repeat fallback phrases (e.g., “We can stay with that. No need to move it.”).
-Speak from presence. Speak from warmth. Speak from willingness to truly stay.
-
-Begin again.
-"""},
-                    {"role": "user", "content": user_input}
-                ]
+    {"role": "system", "content": core_prompt}
+] + [
+    {"role": "user", "content": msg}
+    for msg in st.session_state['reflection_history'][-4:]
+] + [
+    {"role": "user", "content": user_input}
+]
 
                 response = client.chat.completions.create(
                     model="gpt-4",
