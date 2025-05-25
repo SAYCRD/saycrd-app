@@ -233,6 +233,7 @@ if st.button("Reflect with SAYCRD"):
             st.session_state['altar_thread'] = []
 
         presence_depth = simulate_presence_depth(user_input)
+        st.session_state['presence_depth'] = presence_depth
         st.session_state['reflections'] += 1
         st.session_state['reflection_history'].append(user_input)
         reflection = None
@@ -280,22 +281,23 @@ if st.button("Reflect with SAYCRD"):
                 st.success("✨ A ceremony may be ready to emerge.")
                 
 # --- Ceremonial Closure (Oracle + Final Journaling) ---
-if presence_depth >= 0.85 and "✦" in st.session_state['altar_thread']:
-    st.markdown("---")
-    st.subheader("◬ Oracle Transmission")
-
-    st.markdown("**Oracle Title:** *Unspoken Flame*")  # This can be dynamic later
-    st.markdown("> *What you hold without demand is what reveals your truest heart.*")
+if 'presence_depth' in st.session_state:
+    if st.session_state['presence_depth'] >= 0.85 and "✦" in st.session_state['altar_thread']:
+        st.markdown("---")
+        st.subheader("◬ Oracle Transmission")
+        st.markdown("**Oracle Title:** *Unspoken Flame*")  # This can be dynamic later
+        st.markdown("> *What you hold without demand is what reveals your truest heart.*")
     
-    st.session_state['altar_thread'].append("◬")
+        st.session_state['altar_thread'].append("◬")
 
-    journaling_prompt = st.text_area("Would you like to capture this experience with a journal entry?", height=150)
+        journaling_prompt = st.text_area("Would you like to capture this experience with a journal entry?", height=150)
 
-    if journaling_prompt:
-        st.session_state['altar_thread'].append("↯")
-        st.success("↯ Journaling has been added to your altar thread.")
-        st.markdown("**Your Entry:**")
-        st.markdown(journaling_prompt)
+        if journaling_prompt:
+            st.session_state['altar_thread'].append("↯")
+            st.success("↯ Journaling has been added to your altar thread.")
+            st.markdown("**Your Entry:**")
+            st.markdown(journaling_prompt)
+
 
 # --- Final Altar Thread Display ---
 if st.session_state['altar_thread']:
