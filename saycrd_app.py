@@ -486,14 +486,15 @@ if st.button("Reflect with SAYCRD"):
     st.session_state['resonance_flag'] = sacred_flag
 
     with st.spinner("Listening..."):
-    try:
-        # GPT-4 call
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=messages,
-            temperature=0.3
-        )
-        reflection = response.choices[0].message.content
+        try:
+            # GPT-4 call
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=messages,
+                temperature=0.3
+            )
+            reflection = response.choices[0].message.content
+
 
         # --- Sacred Fallback Detection ---
         if any(line in reflection for line in fallback_lines) and st.session_state.get('resonance_flag'):
