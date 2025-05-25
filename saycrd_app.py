@@ -1,3 +1,5 @@
+import streamlit as st
+
 # --- Sidebar Input for OpenAI API Key ---
 st.sidebar.title("SAYCRD Settings")
 api_key = st.sidebar.text_input("Enter your OpenAI API key", type="password")
@@ -7,11 +9,6 @@ if api_key:
     import openai
     openai.api_key = api_key
     st.session_state['client'] = openai
-
-
-
-import streamlit as st
-import openai
 
 # --- SETUP ---
 st.set_page_config(page_title="SAYCRD – Sacred Reflection Engine", layout="centered")
