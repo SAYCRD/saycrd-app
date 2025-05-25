@@ -404,7 +404,7 @@ def simulate_presence_depth(text):
     ]):
         return 0.65
     elif "what do you mean" in text:
-    return 0.6
+        return 0.6
     elif len(text.strip()) > 250:
         return 0.5
     elif len(text.strip()) > 150:
