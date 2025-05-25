@@ -20,15 +20,6 @@ if api_key:
 # --- SETUP ---
 st.title("🔹 SAYCRD – Sacred Reflection Engine")
 
-# Sidebar for API key
-st.sidebar.title("🔐 API Key")
-api_key = st.sidebar.text_input("Enter your OpenAI API key", type="password")
-
-# Only create client if key is present
-if api_key:
-    client = openai.OpenAI(api_key=api_key)
-else:
-    client = None
 
 # --- Session State Setup ---
 if 'reflections' not in st.session_state:
