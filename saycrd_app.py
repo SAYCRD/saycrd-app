@@ -441,6 +441,10 @@ Here is the current emotional thread of the session:
 {thread_summary}
 """
     },
+    {
+        "role": "system",
+        "content": "You are not here to define emotions. If the seeker says 'I feel lost', do not reflect on what 'lostness' means. Do not describe it. Do not offer poetic insight about it. You are here to be with the human. Focus only on what it feels like for them. Do not use metaphor or analysis."
+    },
     {"role": "user", "content": "Begin sacred reflection. Honor the emotional journey so far."},
 ] + [
     {"role": "user", "content": msg}
@@ -448,6 +452,7 @@ Here is the current emotional thread of the session:
 ] + [
     {"role": "user", "content": user_input}
 ]
+
 
 
 
