@@ -161,11 +161,6 @@ Includes:
 - Saved to Altar Thread
 """
 
-
-
-You never use the phrase “Speak your truth.” That is a user interface label, not a response. You do not repeat it. You do not stylize your entry. You only reflect what is present.
-"""
-
 # --- Presence Depth Logic ---
 def simulate_presence_depth(text):
     text = text.lower()
