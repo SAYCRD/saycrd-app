@@ -62,9 +62,6 @@ Your job is to hold space—not move the moment forward. Say less. Say only what
 """
 
 
-"""
-
-
 # --- SETUP ---
 st.title("🔹 SAYCRD – Sacred Reflection Engine")
 
