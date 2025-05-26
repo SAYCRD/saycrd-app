@@ -197,13 +197,17 @@ if st.button("Reflect with SAYCRD"):
         presence_depth = simulate_presence_depth(user_input)
         st.session_state['reflections'] += 1
         st.session_state['reflection_history'].append(user_input)
-        
 
         # --- Presence Holding Tracker ---
         if st.session_state['reflections'] >= 2:
             st.session_state['held_count'] += 1
+            print("Held Count is now:", st.session_state['held_count'])  # DEBUG LINE
         else:
             st.session_state['held_count'] = 0
+
+        
+
+       
 
         reflection = None
 
