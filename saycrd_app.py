@@ -321,7 +321,7 @@ Here is the current emotional thread of the session:
 
 
                 response = client.chat.completions.create(
-                    model="gpt-4",
+                    model="gpt-4o",
                     messages=messages,
                     temperature=0.3
                 )
