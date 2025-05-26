@@ -278,7 +278,7 @@ if 'reflection' in locals() and reflection:
         else:
             st.session_state['response_attempts'] = 0  # reset if response is new
     # 🧘 Presence Deepening Cue Trigger
-    if st.session_state['held_count'] == 2:
+    if st.session_state['held_count'] >= 2:
         import random
         cue = random.choice(presence_cues)
         reflection += f"\n\n🧘 SAYCRD Invitation: {cue}"
