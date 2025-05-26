@@ -205,7 +205,6 @@ if st.button("Reflect with SAYCRD"):
         else:
             st.session_state['held_count'] = 0
 
-        
 
        
 
