@@ -95,7 +95,9 @@ if 'core_prompt' not in st.session_state:
 
 if 'response_attempts' not in st.session_state:
     st.session_state['response_attempts'] = 0
-
+    
+if 'held_count' not in st.session_state:
+    st.session_state['held_count'] = 0
 
 # --- Thread Memory Log ---
 if 'thread_log' not in st.session_state:
@@ -165,6 +167,17 @@ fallback_lines = [
     "Tired. Thank you for bringing that."
 ]
 
+# --- Presence Deepening Cues ---
+presence_cues = [
+    "Where in your body do you feel that the most?",
+    "If that feeling had a shape, what would it be?",
+    "Is there a texture, color, or image that goes with it?",
+    "What’s the space around that feeling like—tight, open, quiet?",
+    "Is that feeling old—or does it feel new today?",
+    "If that part of you could speak, what might it say?"
+]
+
+
 # --- User Input ---
 user_input = st.text_area("What’s present for you?", height=200)
 
@@ -184,6 +197,14 @@ if st.button("Reflect with SAYCRD"):
         presence_depth = simulate_presence_depth(user_input)
         st.session_state['reflections'] += 1
         st.session_state['reflection_history'].append(user_input)
+        
+
+        # --- Presence Holding Tracker ---
+        if st.session_state['reflections'] >= 2:
+            st.session_state['held_count'] += 1
+        else:
+            st.session_state['held_count'] = 0
+
         reflection = None
 
         with st.spinner("Listening..."):
@@ -256,6 +277,12 @@ if 'reflection' in locals() and reflection:
                 st.session_state['response_attempts'] = 0
         else:
             st.session_state['response_attempts'] = 0  # reset if response is new
+    # 🧘 Presence Deepening Cue Trigger
+    if st.session_state['held_count'] == 2:
+        import random
+        cue = random.choice(presence_cues)
+        reflection += f"\n\n🧘 SAYCRD Invitation: {cue}"
+        st.session_state['held_count'] = 0  # reset after offering cue
 
     # 💎 Teaching Injection (always append if missing)
     if "✦ SAYCRD Teaching:" not in reflection:
